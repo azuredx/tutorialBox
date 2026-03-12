@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Список пользователей</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"],
+        input[type="email"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
+        .success {
+            color: green;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>📋 Управление пользователями</h1>
+    
+    <div class="container">
+        <h2>Добавить нового пользователя</h2>
+        <div class="form-group">
+            <label for="name">Имя:</label>
+            <input type="text" id="name" placeholder="Введите имя">
+        </div>
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" placeholder="Введите email">
+        </div>
+        <button onclick="addUser()">Добавить пользователя</button>
+        
+        <div id="message" class="success" style="display: none;"></div>
+        <div id="error" class="error" style="display: none;"></div>
+        
+        <h2>Список пользователей</h2>
+        <table id="users-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Имя</th>
+                    <th>Email</th>
+                    <th>Дата регистрации</th>
+                </tr>
+            </thead>
+            <tbody id="users-list">
+                <tr>
+                    <td colspan="4" style="text-align: center;">Загрузка...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // URL бэкенда (если фронтенд на другом порту)
+        const API_URL = 'http://localhost:5000';
+
+        // Загружаем пользователей при загрузке страницы
+        document.addEventListener('DOMContentLoaded', loadUsers);
+
+        async function loadUsers() {
+            try {
+                const response = await fetch(`${API_URL}/users`);
+                if (!response.ok) throw new Error('Ошибка загрузки');
+                
+                const users = await response.json();
+                displayUsers(users);
+            } catch (error) {
+                showError('Не удалось загрузить пользователей: ' + error.message);
+            }
+        }
+
+        function displayUsers(users) {
+            const tbody = document.getElementById('users-list');
+            
+            if (users.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Нет пользователей</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = users.map(user => `
+                <tr>
+                    <td>${user.id}</td>
+                    <td>${user.name}</td>
+                    <td>${user.email}</td>
+                    <td>${new Date(user.created_at).toLocaleString()}</td>
+                </tr>
+            `).join('');
+        }
+
+        async function addUser() {
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            
+            if (!name || !email) {
+                showError('Заполните все поля');
+                return;
+            }
+            
+            // Простая валидация email
+            if (!email.includes('@') || !email.includes('.')) {
+                showError('Введите корректный email');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/users`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ name, email })
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Ошибка при добавлении');
+                }
+                
+                // Очищаем форму
+                document.getElementById('name').value = '';
+                document.getElementById('email').value = '';
+                
+                // Показываем успех
+                showSuccess('Пользователь успешно добавлен!');
+                
+                // Перезагружаем список
+                await loadUsers();
+                
+            } catch (error) {
+                showError('Ошибка: ' + error.message);
+            }
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            errorDiv.className = 'error';
+            
+            // Скрываем успех если был
+            document.getElementById('message').style.display = 'none';
+            
+            // Автоматически скрываем через 5 секунд
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.getElementById('message');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            successDiv.className = 'success';
+            
+            // Скрываем ошибку если была
+            document.getElementById('error').style.display = 'none';
+            
+            // Автоматически скрываем через 3 секунды
+            setTimeout(() => {
+                successDiv.style.display = 'none';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
