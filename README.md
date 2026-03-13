@@ -10,6 +10,8 @@
 - PostgreSQL для хранения данных
 - Всё приложение запускается одной командой через Docker Compose
 
+![Build Status](https://github.com/azuredx/tutorialBox/actions/workflows/docker-publish.yml/badge.svg)
+
 Проект создан для изучения основ DevOps: контейнеризация, работа с Docker Compose, управление окружением, миграции БД.
 
 ## Быстрый старт
