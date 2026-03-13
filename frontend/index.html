@@ -3,154 +3,227 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Список пользователей</title>
+    <title>TutorialBox Admin | v2.1</title>
     <style>
+        :root {
+            --bg-color: #1a1a1a;
+            --container-bg: #2d2d2d;
+            --text-color: #e0e0e0;
+            --accent-color: #3fb950;
+            --error-color: #f85149;
+            --input-bg: #3d3d3d;
+            --border-color: #444;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #f5f5f5;
+            background-color: var(--bg-color);
+            color: var(--text-color);
         }
+
         h1 {
-            color: #333;
+            color: var(--accent-color);
             text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 10px;
         }
+
         .container {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background-color: var(--container-bg);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            margin-top: 20px;
         }
-        .form-group {
-            margin-bottom: 15px;
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 100px;
+            gap: 15px;
+            align-items: end;
+            margin-bottom: 30px;
         }
-        label {
+
+        @media (max-width: 600px) {
+            .form-grid { grid-template-columns: 1fr; }
+        }
+
+        .form-group label {
             display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+            color: #aaa;
         }
-        input[type="text"],
-        input[type="email"],
-        input[type="number"] {
+
+        input {
             width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            padding: 10px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: white;
             box-sizing: border-box;
         }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
         button {
-            background-color: #4CAF50;
+            background-color: var(--accent-color);
             color: white;
             padding: 10px 20px;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 16px;
+            font-weight: bold;
+            transition: transform 0.2s, background-color 0.2s;
         }
+
         button:hover {
-            background-color: #45a049;
+            background-color: #2ea043;
+            transform: translateY(-2px);
         }
+
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
+            background-color: #252525;
+            border-radius: 8px;
+            overflow: hidden;
         }
+
         th, td {
-            padding: 12px;
+            padding: 15px;
             text-align: left;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid var(--border-color);
         }
+
         th {
-            background-color: #4CAF50;
-            color: white;
+            background-color: #333;
+            color: var(--accent-color);
+            font-weight: 600;
         }
+
         tr:hover {
-            background-color: #f5f5f5;
+            background-color: #2a2a2a;
         }
-        .error {
-            color: red;
-            margin-top: 10px;
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            background: #333;
+            border: 1px solid var(--accent-color);
         }
-        .success {
-            color: green;
-            margin-top: 10px;
-        }
+
+        #error { color: var(--error-color); padding: 10px; display: none; }
+        #message { color: var(--accent-color); padding: 10px; display: none; }
     </style>
 </head>
 <body>
-    <h1>📋 Управление пользователями (v2.0)</h1>
+    <h1>🚀 TutorialBox Platform <small style="font-size: 0.4em; vertical-align: middle;">v2.1</small></h1>
     
     <div class="container">
-        <h2>Добавить нового пользователя</h2>
-        <div class="form-group">
-            <label for="name">Имя:</label>
-            <input type="text" id="name" placeholder="Введите имя">
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="name" placeholder="John Doe">
+            </div>
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" id="email" placeholder="john@example.com">
+            </div>
+            <div class="form-group">
+                <label>Age</label>
+                <input type="number" id="age" placeholder="25">
+            </div>
         </div>
-        <div class="form-group">
-            <label for="email">Email:</label>
-            <input type="email" id="email" placeholder="Введите email">
-        </div>
-        <div class="form-group">
-            <label for="age">Возраст:</label>
-            <input type="number" id="age" placeholder="Введите возраст">
-        </div>
-        <button onclick="addUser()">Добавить пользователя</button>
+        <button style="width: 100%;" onclick="addUser()">Add System User</button>
         
-        <div id="message" class="success" style="display: none;"></div>
-        <div id="error" class="error" style="display: none;"></div>
+        <div id="message"></div>
+        <div id="error"></div>
         
-        <h2>Список пользователей</h2>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 40px;">
+            <h2 style="margin: 0;">Active Users</h2>
+            <span class="status-badge" id="api-status">Connecting...</span>
+        </div>
+
         <table id="users-table">
             <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Имя</th>
-                    <th>Email</th>
-                    <th>Возраст</th>
-                    <th>Дата регистрации</th>
+                    <th>UUID</th>
+                    <th>User Profile</th>
+                    <th>Contact</th>
+                    <th>Age</th>
+                    <th>Registered At</th>
                 </tr>
             </thead>
             <tbody id="users-list">
                 <tr>
-                    <td colspan="5" style="text-align: center;">Загрузка...</td>
+                    <td colspan="5" style="text-align: center;">Initializing...</td>
                 </tr>
             </tbody>
         </table>
     </div>
 
     <script>
-        const API_URL = 'http://localhost:5000';
+        // DevOps: Dynamic API selection
+        const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+            ? 'http://localhost:5000'
+            : `${window.location.origin}/api`;
 
-        document.addEventListener('DOMContentLoaded', loadUsers);
+        document.addEventListener('DOMContentLoaded', () => {
+            loadUsers();
+            updateStatus();
+        });
+
+        async function updateStatus() {
+            const statusBadge = document.getElementById('api-status');
+            try {
+                const res = await fetch(`${API_URL}/health`);
+                if (res.ok) {
+                    statusBadge.textContent = 'API: Online';
+                    statusBadge.style.borderColor = '#3fb950';
+                }
+            } catch {
+                statusBadge.textContent = 'API: Offline';
+                statusBadge.style.borderColor = '#f85149';
+            }
+        }
 
         async function loadUsers() {
             try {
                 const response = await fetch(`${API_URL}/users`);
-                if (!response.ok) throw new Error('Ошибка загрузки');
-                
+                if (!response.ok) throw new Error('Fetch failed');
                 const users = await response.json();
                 displayUsers(users);
             } catch (error) {
-                showError('Не удалось загрузить пользователей: ' + error.message);
+                showError('Database link lost: ' + error.message);
             }
         }
 
         function displayUsers(users) {
             const tbody = document.getElementById('users-list');
-            
             if (users.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Нет пользователей</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No records found in database</td></tr>';
                 return;
             }
-            
             tbody.innerHTML = users.map(user => `
                 <tr>
-                    <td>${user.id}</td>
-                    <td>${user.name}</td>
+                    <td><code style="color: #8b949e">#${user.id}</code></td>
+                    <td style="font-weight: bold">${user.name}</td>
                     <td>${user.email}</td>
                     <td>${user.age || '—'}</td>
-                    <td>${new Date(user.created_at).toLocaleString()}</td>
+                    <td style="font-size: 0.85em; color: #8b949e">${new Date(user.created_at).toLocaleString()}</td>
                 </tr>
             `).join('');
         }
@@ -160,69 +233,37 @@
             const email = document.getElementById('email').value.trim();
             const age = document.getElementById('age').value.trim();
             
-            if (!name || !email) {
-                showError('Заполните имя и email');
-                return;
-            }
+            if (!name || !email) { showError('Name and Email are mandatory'); return; }
             
-            if (!email.includes('@') || !email.includes('.')) {
-                showError('Введите корректный email');
-                return;
-            }
-            
-            const userData = { name, email };
-            if (age) {
-                userData.age = parseInt(age);
-            }
+            const userData = { name, email, age: age ? parseInt(age) : null };
             
             try {
                 const response = await fetch(`${API_URL}/users`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(userData)
                 });
                 
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.error || 'Ошибка при добавлении');
-                }
+                if (!response.ok) throw new Error('Validation error');
                 
-                document.getElementById('name').value = '';
-                document.getElementById('email').value = '';
-                document.getElementById('age').value = '';
-                
-                showSuccess('Пользователь успешно добавлен!');
-                await loadUsers();
-                
+                ['name', 'email', 'age'].forEach(id => document.getElementById(id).value = '');
+                showSuccess('User synchronized successfully');
+                loadUsers();
             } catch (error) {
-                showError('Ошибка: ' + error.message);
+                showError('Sync failed: ' + error.message);
             }
         }
 
-        function showError(message) {
-            const errorDiv = document.getElementById('error');
-            errorDiv.textContent = message;
-            errorDiv.style.display = 'block';
-            errorDiv.className = 'error';
-            document.getElementById('message').style.display = 'none';
-            
-            setTimeout(() => {
-                errorDiv.style.display = 'none';
-            }, 5000);
+        function showError(m) {
+            const e = document.getElementById('error');
+            e.textContent = m; e.style.display = 'block';
+            setTimeout(() => e.style.display = 'none', 5000);
         }
 
-        function showSuccess(message) {
-            const successDiv = document.getElementById('message');
-            successDiv.textContent = message;
-            successDiv.style.display = 'block';
-            successDiv.className = 'success';
-            document.getElementById('error').style.display = 'none';
-            
-            setTimeout(() => {
-                successDiv.style.display = 'none';
-            }, 3000);
+        function showSuccess(m) {
+            const s = document.getElementById('message');
+            s.textContent = m; s.style.display = 'block';
+            setTimeout(() => s.style.display = 'none', 3000);
         }
     </script>
 </body>

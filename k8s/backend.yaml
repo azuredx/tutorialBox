@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: backend
-        image: azuredx/tutorialbox-backend:latest
+        image: azuredx/tutorialbox-backend:v2.1
         ports:
         - containerPort: 5000
         env:
