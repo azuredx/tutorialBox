@@ -29,7 +29,8 @@ cd tutorialBox
 docker-compose up --build -d
 
 # Инициализировать базу данных
-docker-compose exec backend python init_db.py ```
+docker-compose exec backend python init_db.py
+```
 
 # После запуска
 
@@ -58,7 +59,7 @@ backend:
     DB_NAME: mydb
     DB_USER: myuser
     DB_PASSWORD: mypassword
-
+```
 # Чему я научился
 
 -  Ручной разворот приложения на голом Linux
