@@ -31,13 +31,14 @@ cd tutorialBox
 docker-compose up --build -d
 
 # Инициализировать базу данных
-docker-compose exec backend python init_db.py ```
+docker-compose exec backend python init_db.py
+```
 
 # После запуска
 
 -  Фронтенд: http://localhost
 -  API: http://localhost:5000/users
--  ostgreSQL: localhost:5432
+-  PostgreSQL: localhost:5432
 
 # Docker-образы
 
@@ -60,7 +61,7 @@ backend:
     DB_NAME: mydb
     DB_USER: myuser
     DB_PASSWORD: mypassword
-
+```
 # Чему я научился
 
 -  Ручной разворот приложения на голом Linux
@@ -75,12 +76,13 @@ backend:
 
 Проект распространяется под лицензией MIT.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 MIT © [azure](https://github.com/azuredx) — см. файл [LICENSE](LICENSE)
----
 
-#💻 Автор
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**azure**  
+# Автор
+
+**azure**
+
 [![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/azuredx)
 [![Telegram](https://img.shields.io/badge/Telegram-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/roo21k)
