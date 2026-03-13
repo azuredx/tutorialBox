@@ -36,7 +36,7 @@ docker-compose exec backend python init_db.py
 
 -  Фронтенд: http://localhost
 -  API: http://localhost:5000/users
--  ostgreSQL: localhost:5432
+-  PostgreSQL: localhost:5432
 
 # Docker-образы
 
