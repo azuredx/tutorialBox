@@ -75,9 +75,8 @@ backend:
 Проект распространяется под лицензией MIT.
 
 MIT © [azure](https://github.com/azuredx) — см. файл [LICENSE](LICENSE)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
----
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 # Автор
 
