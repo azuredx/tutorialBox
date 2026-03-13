@@ -5,19 +5,17 @@ import os
 from psycopg2.extras import RealDictCursor
 
 app = Flask(__name__)
-CORS(app)  # Разрешаем запросы с фронтенда
+CORS(app)
 
-# Параметры подключения к БД (потом поменяешь на свои)
 DB_CONFIG = {
-    "host": "localhost",
-    "database": "mydb",
-    "user": "myuser",
-    "password": "mypassword",
+    "host": os.getenv("DB_HOST", "localhost"),
+    "database": os.getenv("DB_NAME", "mydb"),
+    "user": os.getenv("DB_USER", "myuser"),
+    "password": os.getenv("DB_PASSWORD", "mypassword"),
     "port": "5432"
 }
 
 def get_db_connection():
-    """Создает подключение к базе данных"""
     try:
         conn = psycopg2.connect(**DB_CONFIG, cursor_factory=RealDictCursor)
         return conn
@@ -27,19 +25,17 @@ def get_db_connection():
 
 @app.route('/health', methods=['GET'])
 def health_check():
-    """Проверка, что сервер работает"""
     return jsonify({"status": "ok", "message": "Backend is running"})
 
 @app.route('/users', methods=['GET'])
 def get_users():
-    """Получить всех пользователей"""
     conn = get_db_connection()
     if not conn:
         return jsonify({"error": "Database connection failed"}), 500
     
     try:
         cur = conn.cursor()
-        cur.execute("SELECT id, name, email, created_at FROM users ORDER BY id;")
+        cur.execute("SELECT id, name, email, age, created_at FROM users ORDER BY id;")
         users = cur.fetchall()
         cur.close()
         conn.close()
@@ -49,11 +45,12 @@ def get_users():
 
 @app.route('/users', methods=['POST'])
 def create_user():
-    """Создать нового пользователя"""
     data = request.get_json()
     
     if not data or 'name' not in data or 'email' not in data:
         return jsonify({"error": "Name and email are required"}), 400
+    
+    age = data.get('age', None)
     
     conn = get_db_connection()
     if not conn:
@@ -61,10 +58,16 @@ def create_user():
     
     try:
         cur = conn.cursor()
-        cur.execute(
-            "INSERT INTO users (name, email) VALUES (%s, %s) RETURNING id;",
-            (data['name'], data['email'])
-        )
+        if age:
+            cur.execute(
+                "INSERT INTO users (name, email, age) VALUES (%s, %s, %s) RETURNING id;",
+                (data['name'], data['email'], age)
+            )
+        else:
+            cur.execute(
+                "INSERT INTO users (name, email) VALUES (%s, %s) RETURNING id;",
+                (data['name'], data['email'])
+            )
         user_id = cur.fetchone()['id']
         conn.commit()
         cur.close()

@@ -1,0 +1,17 @@
+# Виртуальное окружение Python
+venv/
+__pycache__/
+*.pyc
+
+# Docker volumes (не нужны, они в Docker)
+data/
+postgres_data/
+
+# Локальные конфиги (если будут)
+.env
+*.local
+
+# Редакторы
+.vscode/
+.idea/
+*.swp
