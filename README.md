@@ -29,7 +29,7 @@ cd tutorialBox
 docker-compose up --build -d
 
 # Инициализировать базу данных
-docker-compose exec backend python init_db.py
+docker-compose exec backend python init_db.py ```
 
 # После запуска
 
