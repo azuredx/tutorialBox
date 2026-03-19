@@ -1,0 +1,18 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: backend-monitor
+  namespace: monitoring # Важно: кладем в namespace к самому Prometheus
+  labels:
+    release: prometheus # Этот лейбл помогает оператору "подхватить" файл
+spec:
+  selector:
+    matchLabels:
+      app: backend # Должно совпадать с лейблом твоего сервиса
+  namespaceSelector:
+    matchNames:
+      - tutorialbox # Имя твоего namespace с приложением
+  endpoints:
+  - port: http # Имя порта, которое должно быть прописано в Service
+    path: /metrics
+    interval: 15s

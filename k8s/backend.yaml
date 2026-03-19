@@ -12,10 +12,15 @@ spec:
     metadata:
       labels:
         app: backend
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "5000"
+        prometheus.io/path: "/metrics"
     spec:
       containers:
       - name: backend
-        image: azuredx/tutorialbox-backend:v2.1
+        image: azuredx/tutorialbox-backend:v2.2
+        imagePullPolicy: Always
         ports:
         - containerPort: 5000
         env:
@@ -27,6 +32,8 @@ spec:
           value: "myuser"
         - name: DB_PASSWORD
           value: "mypassword"
+
+
 ---
 apiVersion: v1
 kind: Service
