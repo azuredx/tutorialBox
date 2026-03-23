@@ -1,4 +1,4 @@
-name: Build and Push Docker Image
+name: CI/CD Pipeline
 
 on:
   push:
@@ -6,8 +6,25 @@ on:
   workflow_dispatch:
 
 jobs:
+  # 1. Этап проверки кода (Linting)
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: Install linter
+        run: pip install flake8
+      - name: Run flake8
+        # Проверяем только синтаксические ошибки (E9, F63, F7, F82)
+        run: flake8 ./backend --count --select=E9,F63,F7,F82 --show-source --statistics
+
+  # 2. Этап сборки и пуша (зависит от lint)
   build-and-push:
     runs-on: ubuntu-latest
+    needs: lint  # Сборка не начнется, пока lint не пройдет успешно!
     
     steps:
       - name: Checkout code
@@ -21,11 +38,6 @@ jobs:
       
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-      
-      - name: Extract metadata
-        id: meta
-        run: |
-          echo "tags=${{ secrets.DOCKER_USERNAME }}/tutorialbox:latest,${{ secrets.DOCKER_USERNAME }}/tutorialbox:${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
       
       - name: Build and push Backend
         uses: docker/build-push-action@v6
