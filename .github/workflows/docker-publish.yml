@@ -2,12 +2,11 @@ name: CI/CD TutorialBox
 
 on:
   push:
-    # Запускаем пайплайн при пуше в любые ветки, чтобы работали тесты
     branches: [ "main", "feature/*" ]
   workflow_dispatch:
 
 jobs:
-  # 1. Сначала проверяем качество кода
+  # --- ЭТАП 1: ПРОВЕРКА КОДА ---
   lint:
     runs-on: ubuntu-latest
     steps:
@@ -19,15 +18,13 @@ jobs:
       - name: Install flake8
         run: pip install flake8
       - name: Run lint
-        # Проверяем бэкенд на критические ошибки
         run: flake8 ./backend --count --select=E9,F63,F7,F82 --show-source --statistics
 
-  # 2. Сборка и пуш (только если прошел lint И это ветка main)
+  # --- ЭТАП 2: СБОРКА И ПУШ ОБРАЗОВ ---
   build-and-push:
     runs-on: ubuntu-latest
     needs: lint
-    if: github.ref == 'refs/heads/main' # Условие: пушим только из main
-    
+    if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -58,3 +55,31 @@ jobs:
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/tutorialbox-frontend:latest
             ${{ secrets.DOCKER_USERNAME }}/tutorialbox-frontend:${{ github.sha }}
+
+  # --- ЭТАП 3: ДЕПЛОЙ В KUBERNETES ---
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Kubeconfig
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
+          chmod 600 ~/.kube/config
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+
+      - name: Update Kubernetes Deployment
+        run: |
+          # Обновляем образы в кластере, используя SHA коммита для точности
+          kubectl set image deployment/backend-deployment backend=${{ secrets.DOCKER_USERNAME }}/tutorialbox-backend:${{ github.sha }} -n tutorialbox
+          kubectl set image deployment/frontend-deployment frontend=${{ secrets.DOCKER_USERNAME }}/tutorialbox-frontend:${{ github.sha }} -n tutorialbox
+          
+          # Ожидаем успешного завершения обновления
+          kubectl rollout status deployment/backend-deployment -n tutorialbox
+          kubectl rollout status deployment/frontend-deployment -n tutorialbox
