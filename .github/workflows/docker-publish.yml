@@ -71,9 +71,13 @@ jobs:
       
       - name: Update Kubernetes Deployment
         run: |
-          # Используем локальный kubectl, который уже настроен на minikube
-          kubectl set image deployment/backend-deployment backend=${{ secrets.DOCKER_USERNAME }}/tutorialbox-backend:${{ github.sha }} -n tutorialbox
-          kubectl set image deployment/frontend-deployment frontend=${{ secrets.DOCKER_USERNAME }}/tutorialbox-frontend:${{ github.sha }} -n tutorialbox
+          # 1. Сначала проверим, как точно называются деплойменты (для логов раннера)
+          kubectl get deployments -n tutorialbox
           
-          kubectl rollout status deployment/backend-deployment -n tutorialbox
-          kubectl rollout status deployment/frontend-deployment -n tutorialbox
+          # 2. Обновляем образы (используем короткие имена 'backend' и 'frontend')
+          kubectl set image deployment/backend backend=${{ secrets.DOCKER_USERNAME }}/tutorialbox-backend:${{ github.sha }} -n tutorialbox
+          kubectl set image deployment/frontend frontend=${{ secrets.DOCKER_USERNAME }}/tutorialbox-frontend:${{ github.sha }} -n tutorialbox
+          
+          # 3. Ожидаем завершения
+          kubectl rollout status deployment/backend -n tutorialbox
+          kubectl rollout status deployment/frontend -n tutorialbox
