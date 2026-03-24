@@ -57,7 +57,7 @@ jobs:
             ${{ secrets.DOCKER_USERNAME }}/tutorialbox-frontend:${{ github.sha }}
 
   # --- ЭТАП 3: ДЕПЛОЙ В KUBERNETES ---
-deploy:
+  deploy:
     runs-on: self-hosted  # Твой Arch подхватит эту задачу
     needs: build-and-push
     if: github.ref == 'refs/heads/main'
