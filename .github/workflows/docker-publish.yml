@@ -57,29 +57,23 @@ jobs:
             ${{ secrets.DOCKER_USERNAME }}/tutorialbox-frontend:${{ github.sha }}
 
   # --- ЭТАП 3: ДЕПЛОЙ В KUBERNETES ---
-  deploy:
-    runs-on: ubuntu-latest
+deploy:
+    runs-on: self-hosted  # Твой Arch подхватит эту задачу
     needs: build-and-push
     if: github.ref == 'refs/heads/main'
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Kubeconfig
-        run: |
-          mkdir -p ~/.kube
-          echo "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
-          chmod 600 ~/.kube/config
-
-      - name: Set up kubectl
-        uses: azure/setup-kubectl@v3
-
+      # Нам больше не нужно настраивать Kubeconfig через секреты!
+      # Твой раннер на Arch уже "видит" minikube.
+      
       - name: Update Kubernetes Deployment
         run: |
-          # Обновляем образы в кластере, используя SHA коммита для точности
+          # Используем локальный kubectl, который уже настроен на minikube
           kubectl set image deployment/backend-deployment backend=${{ secrets.DOCKER_USERNAME }}/tutorialbox-backend:${{ github.sha }} -n tutorialbox
           kubectl set image deployment/frontend-deployment frontend=${{ secrets.DOCKER_USERNAME }}/tutorialbox-frontend:${{ github.sha }} -n tutorialbox
           
-          # Ожидаем успешного завершения обновления
           kubectl rollout status deployment/backend-deployment -n tutorialbox
           kubectl rollout status deployment/frontend-deployment -n tutorialbox
